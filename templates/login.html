@@ -18,6 +18,13 @@
       src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"
       crossorigin="anonymous"
     ></script>
+    <style type="text/css">
+        /* erro class styling */
+        .error { 
+        color: #ff0000;
+        font-weight: normal;
+        }
+    </style>
   </head>
   <body class="bg-primary">
     <div id="layoutAuthentication">
@@ -29,26 +36,42 @@
                 <div class="card shadow-lg border-0 rounded-lg mt-5">
                   <div class="card-header">
                     <h3 class="text-center font-weight-light my-4">Login</h3>
+                  {% if error %}
+                    <div
+                      class="alert alert-danger alert-dismissible fade show"
+                      role="alert"
+                    >
+                      <strong>Error!</strong> Email OR Password Invalid.
+                      <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"
+                      ></button>
+                    </div>
+                    {% endif %}
                   </div>
                   <div class="card-body">
-                    <form>
-                      <div class="form-floating mb-3">
+                    <form id="myForm" name="myForm" method="POST">
+                      <div class="mb-3">
+                        <label for="email">Email address</label>
                         <input
                           class="form-control"
-                          id="inputEmail"
+                          id="email"
+                          name="email"
                           type="email"
                           placeholder="name@example.com"
                         />
-                        <label for="inputEmail">Email address</label>
                       </div>
-                      <div class="form-floating mb-3">
+                      <div class="mb-3">
+                        <label for="password">Password</label>
                         <input
                           class="form-control"
-                          id="inputPassword"
+                          id="password"
+                          name="password"
                           type="password"
                           placeholder="Password"
                         />
-                        <label for="inputPassword">Password</label>
                       </div>
                       <div class="form-check mb-3">
                         <input
@@ -71,7 +94,7 @@
                           >Forgot Password?</a
                         >
                         -->
-                        <a class="btn btn-primary" href="index.html">Login</a>
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
                       </div>
                     </form>
                   </div>
@@ -105,9 +128,45 @@
         </footer>
       </div>
     </div>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.21.0/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript">
+      $("#myForm").validate({
+        rules: {
+          email: {
+            required: true,
+            email: true,
+          },
+          password: {
+            required: true,
+            minlength: 6,
+          },
+          messages: {
+            email: {
+              required: "Please enter your email",
+              email: "Enter a valid email address",
+            },
+            password: {
+              required: "Please enter a password",
+              minlength: "Password must be at least 6 characters",
+            },
+          },
+          errorPlacement: function(error, element) {
+              if ( element.is(":radio") ) 
+              {
+                  error.appendTo( element.parents('.form-group') );
+              }else 
+              { // This is the default behavior 
+                  error.insertAfter( element );
+              }
+          },
+          submitHandler: function (form) {
+            alert("Form submitted successfully!");
+            form.submit(); // Submit the form
+          },
+        },
+      });
+    </script>
   </body>
 </html>

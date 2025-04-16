@@ -18,6 +18,11 @@
       src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"
       crossorigin="anonymous"
     ></script>
+    <style>
+      .error {
+        color: red;
+      }
+    </style>
   </head>
   <body class="bg-primary">
     <div id="layoutAuthentication">
@@ -33,71 +38,73 @@
                     </h3>
                   </div>
                   <div class="card-body">
-                    <form>
+                    <form id="myForm" name="myForm" method="POST">
                       <div class="row mb-3">
                         <div class="col-md-6">
-                          <div class="form-floating mb-3 mb-md-0">
+                          <div class="mb-3 mb-md-0">
+                            <label for="fname">First name</label>
                             <input
                               class="form-control"
-                              id="inputFirstName"
+                              id="fname"
+                              name="fname"
                               type="text"
                               placeholder="Enter your first name"
                             />
-                            <label for="inputFirstName">First name</label>
                           </div>
                         </div>
                         <div class="col-md-6">
-                          <div class="form-floating">
+                          <div class="mb-3 mb-md-0">
+                            <label for="inputLastName">Last name</label>
                             <input
                               class="form-control"
-                              id="inputLastName"
+                              id="lname"
+                              name="lname"
                               type="text"
                               placeholder="Enter your last name"
                             />
-                            <label for="inputLastName">Last name</label>
                           </div>
                         </div>
                       </div>
-                      <div class="form-floating mb-3">
+                      <div class="mb-3">
+                        <label for="inputEmail">Email address</label>
                         <input
                           class="form-control"
-                          id="inputEmail"
+                          id="email"
+                          name="email"
                           type="email"
                           placeholder="name@example.com"
                         />
-                        <label for="inputEmail">Email address</label>
                       </div>
                       <div class="row mb-3">
                         <div class="col-md-6">
-                          <div class="form-floating mb-3 mb-md-0">
+                          <div class="mb-3 mb-md-0">
+                            <label for="password">Password</label>
                             <input
                               class="form-control"
-                              id="inputPassword"
+                              id="password"
+                              name="password"
                               type="password"
                               placeholder="Create a password"
                             />
-                            <label for="inputPassword">Password</label>
                           </div>
                         </div>
                         <div class="col-md-6">
-                          <div class="form-floating mb-3 mb-md-0">
+                          <div class="mb-3 mb-md-0">
+                            <label for="confirmPassword"
+                              >Confirm Password</label>
                             <input
                               class="form-control"
-                              id="inputPasswordConfirm"
+                              id="confirmPassword"
+                              name="confirmPassword"
                               type="password"
                               placeholder="Confirm password"
                             />
-                            <label for="inputPasswordConfirm"
-                              >Confirm Password</label
-                            >
                           </div>
                         </div>
                       </div>
                       <div class="mt-4 mb-0">
                         <div class="d-grid">
-                          <a class="btn btn-primary btn-block" href="login.html"
-                            >Create Account</a
-                          >
+                          <button type="submit" class="btn btn-primary w-100">Create Account</button>
                         </div>
                       </div>
                     </form>
@@ -132,10 +139,55 @@
         </footer>
       </div>
     </div>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-      crossorigin="anonymous"
-    ></script>
-    <script src="js/scripts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.21.0/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        console.log("Document is ready");
+        $("#myForm").validate({
+          rules: {
+            fname: {
+              required: true,
+              minlength: 5,
+            },
+            email: {
+              required: true,
+              email: true,
+            },
+            password: {
+              required: true,
+              minlength: 6,
+            },
+            confirmPassword: {
+              required: true,
+              equalTo: "#password",
+            },
+          },
+          messages: {
+            username: {
+              required: "Please enter a name",
+              minlength: "Name must be at least 5 characters",
+            },
+            email: {
+              required: "Please enter your email",
+              email: "Enter a valid email address",
+            },
+            password: {
+              required: "Please enter a password",
+              minlength: "Password must be at least 6 characters",
+            },
+            confirmPassword: {
+              required: "Please enter a confirm password",
+              equalTo: "Passwords do not match",
+            },
+          },
+          submitHandler: function (form) {
+            alert("Form submitted successfully!");
+            form.submit(); // Submit the form
+          },
+        });
+      });
+    </script>
   </body>
 </html>
