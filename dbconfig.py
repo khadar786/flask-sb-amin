@@ -16,6 +16,7 @@ def db_connection():
         )
         
         if connection.is_connected():
+            #print("Connection successful")
             return connection
         else:
             print("Connection failed")
