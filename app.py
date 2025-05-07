@@ -19,7 +19,17 @@ cursor = db_conn.cursor(dictionary=True)
         
 app=Flask(__name__,template_folder='templates',static_url_path='/static')
 app.config['SECRET_KEY']='mysecretkey'
+# Folder to save uploaded images
+UPLOAD_FOLDER = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# Allowed file extensions
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+           
 @app.route("/",methods=['GET'])
 def index():
     if 'user_id' not in session:
@@ -87,6 +97,22 @@ def register():
                 error=True
                 
     return render_template("register.html",user_id=user_id,message=message,error=error)
+
+@app.route("/add_user",methods=['GET'])
+def add_user():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        first_name=request.form.get('fname')
+        last_name=request.form.get('lname')
+        email=request.form.get('email')
+        mobile=request.form.get('mobile')
+        gender=request.form.get('inlineRadioOptions')
+        address=request.form.get('address')
+        
+        
+    return render_template("add_user.html")
 
 @app.route('/logout', methods=['GET'])
 def logout():
