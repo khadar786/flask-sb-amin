@@ -1,4 +1,5 @@
 from flask import Flask,render_template,session,request,redirect,url_for
+from werkzeug.utils import secure_filename
 from dbconfig import db_connection
 import os
 import shutil
@@ -98,21 +99,61 @@ def register():
                 
     return render_template("register.html",user_id=user_id,message=message,error=error)
 
-@app.route("/add_user",methods=['GET'])
+@app.route("/add_user",methods=['GET','POST'])
 def add_user():
+    customer_id=''
+    message=''
+    error=False
+    
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
     if request.method == 'POST':
+        email=request.form.get('email')
+        check_q="""SELECT * FROM user_profile WHERE email=%s"""
+        cursor.execute(check_q,(email,))
+        check_result=cursor.fetchone()
+        
+        if check_result is not None:
+            message='User already exists'
+            error=True
+            return render_template("add_user.html",customer_id=customer_id,message=message,error=error)
+        
+        mobile=request.form.get('mobile')
+        m_check_q="""SELECT * FROM user_profile WHERE mobile=%s"""
+        cursor.execute(m_check_q,(mobile,))
+        m_check_result=cursor.fetchone()
+        if m_check_result is not None:
+            message='Mobile number already exists'
+            error=True
+            return render_template("add_user.html",customer_id=customer_id,message=message,error=error)
+            
+        # Check if the post request has the file part
+        if 'imageUpload' not in request.files:
+            return render_template("add_user.html",customer_id=customer_id,message="No file part",error=True)
+        
+        file = request.files['imageUpload']
+        
+        if file.filename == '':
+            return render_template("add_user.html",customer_id=customer_id,message="No selected file",error=True)
+        
         first_name=request.form.get('fname')
         last_name=request.form.get('lname')
-        email=request.form.get('email')
-        mobile=request.form.get('mobile')
-        gender=request.form.get('inlineRadioOptions')
+        gender=request.form.get('gender')
         address=request.form.get('address')
         
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            fielpath='uploads/'+filename
+            insert_q="""INSERT INTO user_profile(first_name,last_name,email,mobile,gender,user_level,photo)VALUES (%s,%s,%s,%s,%s,%s,%s)"""
+            cursor.execute(insert_q,(first_name,last_name,email,mobile,gender,1,fielpath))
+            db_conn.commit()
+            customer_id=cursor.lastrowid
+            message='User has been created'
+            error=False
         
-    return render_template("add_user.html")
+    return render_template("add_user.html",customer_id=customer_id,message=message,error=error)
 
 @app.route('/logout', methods=['GET'])
 def logout():
