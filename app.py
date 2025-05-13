@@ -137,6 +137,9 @@ def add_user():
         if file.filename == '':
             return render_template("add_user.html",customer_id=customer_id,message="No selected file",error=True)
         
+        password=email.split('@')[0]
+        pwdresult=hashlib.sha1(password.encode())
+        pwd_result=pwdresult.hexdigest()
         first_name=request.form.get('fname')
         last_name=request.form.get('lname')
         gender=request.form.get('gender')
@@ -146,14 +149,24 @@ def add_user():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             fielpath='uploads/'+filename
-            insert_q="""INSERT INTO user_profile(first_name,last_name,email,mobile,gender,user_level,photo)VALUES (%s,%s,%s,%s,%s,%s,%s)"""
-            cursor.execute(insert_q,(first_name,last_name,email,mobile,gender,1,fielpath))
+            insert_q="""INSERT INTO user_profile(first_name,last_name,email,mobile,gender,user_level,photo,password)VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"""
+            cursor.execute(insert_q,(first_name,last_name,email,mobile,gender,1,fielpath,pwd_result))
             db_conn.commit()
             customer_id=cursor.lastrowid
             message='User has been created'
             error=False
         
     return render_template("add_user.html",customer_id=customer_id,message=message,error=error)
+
+@app.route("/users",methods=['GET','POST'])
+def users():
+    message=''
+    error=False
+    
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+        
+    return render_template("users.html",)
 
 @app.route('/logout', methods=['GET'])
 def logout():

@@ -1,0 +1,231 @@
+{% extends "base.html" %} {% block styles %}
+<style>
+  .error {
+    color: red;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="container-fluid px-4">
+  <h1 class="mt-4">Users</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="./">Dashboard</a></li>
+    <li class="breadcrumb-item active">Users</li>
+  </ol>
+  <div class="card mb-4">
+    <div class="card-header">
+      <i class="fas fa-user me-1"></i>
+      Add User {% if customer_id and not error %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Success!</strong> {{message}}.
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endif %} {% if error %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error!</strong> {{message}}.
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endif %}
+    </div>
+    <div class="card-body">
+      <form
+        id="myForm"
+        name="myForm"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <div class="row">
+          <div class="col-xl-6">
+            <div class="mb-5 mb-md-0">
+              <label for="fname">First name</label>
+              <input
+                class="form-control"
+                id="fname"
+                name="fname"
+                type="text"
+                placeholder="Enter your first name"
+              />
+            </div>
+            <div class="mb-5 mb-md-0">
+              <label for="email">Email</label>
+              <input
+                class="form-control"
+                id="email"
+                name="email"
+                type="text"
+                placeholder="Enter your first name"
+              />
+            </div>
+            <div class="mb-5 mb-md-0">
+              <label for="email">Gender</label>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="gender"
+                  id="inlineRadio1"
+                  value="M"
+                  checked="checked"
+                />
+                <label class="form-check-label" for="inlineRadio1">Male</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="gender"
+                  id="inlineRadio2"
+                  value="F"
+                />
+                <label class="form-check-label" for="inlineRadio2"
+                  >Female</label
+                >
+              </div>
+            </div>
+            <div class="mb-5 mb-md-0">
+              <label for="address">Address</label>
+              <textarea
+                class="form-control"
+                id="address"
+                name="address"
+                rows="3"
+                placeholder="Enter your address"
+              ></textarea>
+            </div>
+          </div>
+          <div class="col-xl-6">
+            <div class="mb-5 mb-md-0">
+              <label for="lname">Last name</label>
+              <input
+                class="form-control"
+                id="lname"
+                name="lname"
+                type="text"
+                placeholder="Enter your last name"
+              />
+            </div>
+            <div class="mb-5 mb-md-0">
+              <label for="lname">Mobile No</label>
+              <input
+                class="form-control"
+                id="mobile"
+                name="mobile"
+                type="text"
+                placeholder="Enter your mobile number"
+              />
+            </div>
+            <div class="mb-5 mb-md-0">
+              <label for="imageUpload">Upload Image</label>
+              <input
+                class="form-control"
+                type="file"
+                id="imageUpload"
+                name="imageUpload"
+                accept="image/*"
+                onchange="previewImage(event)"
+              />
+              <div class="mt-3">
+                <img
+                  id="imagePreview"
+                  src="#"
+                  alt="Image Preview"
+                  style="display: none; max-width: 100%; height: auto"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" style="margin-top: 10px">
+          <div class="col-xl-12" style="text-align: center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.21.0/dist/jquery.validate.min.js"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
+  crossorigin="anonymous"
+></script>
+<script src="{{ url_for('static',filename='js/datatables-simple-demo.js') }}"></script>
+<script type="text/javascript">
+  // Function to preview the image
+  function previewImage(event) {
+    const input = event.target;
+    const preview = document.getElementById("imagePreview");
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.style.display = "block";
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  $(document).ready(function () {
+    console.log("Document is ready");
+    $("#myForm").validate({
+      rules: {
+        fname: {
+          required: true,
+          minlength: 5,
+        },
+        lname: {
+          required: true,
+          minlength: 5,
+        },
+        email: {
+          required: true,
+          email: true,
+        },
+        mobile: {
+          required: true,
+          minlength: 10,
+        },
+        imageUpload: {
+          required: true,
+        },
+      },
+      messages: {
+        fname: {
+          required: "Please enter a first name",
+          minlength: "first name must be at least 5 characters",
+        },
+        lname: {
+          required: "Please enter a last name",
+          minlength: "last name be at least 5 characters",
+        },
+        email: {
+          required: "Please enter your email",
+          email: "Enter a valid email address",
+        },
+        mobile: {
+          required: "Please enter a mobile number",
+          minlength: "mobile number be at least 10 numbers",
+        },
+        imageUpload: {
+          required: "Please upload an image",
+        },
+      },
+      submitHandler: function (form) {
+        //alert("Form submitted successfully!");
+        form.submit(); // Submit the form
+      },
+    });
+  });
+</script>
+{% endblock %}
