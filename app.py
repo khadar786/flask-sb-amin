@@ -1,4 +1,4 @@
-from flask import Flask,render_template,session,request,redirect,url_for
+from flask import Flask,render_template,session,request,redirect,url_for,jsonify
 from werkzeug.utils import secure_filename
 from dbconfig import db_connection
 import os
@@ -167,6 +167,41 @@ def users():
         return redirect(url_for('login'))
         
     return render_template("users.html",)
+
+@app.route('/user_data',methods=['POST'])
+def data():
+    draw = int(request.form.get('draw'))
+    start = int(request.form.get('start'))
+    length = int(request.form.get('length'))
+    search_value = request.form.get('search[value]', '')
+    print(search_value)
+    cursor.execute("SELECT COUNT(*) as count FROM user_profile")
+    records_total = cursor.fetchone()['count']
+        
+    if search_value:
+        query="""
+        SELECT id,first_name,last_name,mobile,email,user_level,doj,photo,user_status FROM user_profile WHERE first_name LIKE %s OR last_name LIKE %s OR email LIKE %s OR mobile LIKE %s LIMIT %s OFFSET %s
+        """
+        search_terms = f"%{search_value}%"
+        cursor.execute(query, (search_terms, search_terms, search_terms, search_terms, length, start))
+        data = cursor.fetchall()
+        
+        cursor.execute("SELECT COUNT(*) as count FROM user_profile WHERE first_name LIKE %s OR last_name LIKE %s OR email LIKE %s OR mobile LIKE %s", (search_terms, search_terms, search_terms, search_terms))
+        records_total = cursor.fetchone()['count']
+    else:
+        cursor.execute("SELECT id,first_name,last_name,mobile,email,user_level,doj,photo,user_status FROM user_profile LIMIT %s OFFSET %s", (length, start))
+        data = cursor.fetchall()
+    
+    #cursor.close()
+    #db_conn.close()
+    return jsonify({
+        'draw': draw,
+        'recordsTotal': records_total,
+        'recordsFiltered': records_total,
+        'data': data,
+        'search_value':search_value
+    })
+
 
 @app.route('/logout', methods=['GET'])
 def logout():
